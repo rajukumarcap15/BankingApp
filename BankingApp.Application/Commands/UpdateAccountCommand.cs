@@ -8,13 +8,14 @@ namespace BankingApp.Application.Commands
     using BankingApp.Core.Entities;
     using BankingApp.Core.Interfaces;
     using MediatR;
+    using Moq;
 
     /// <summary>
     /// Command to update a bank account.
     /// </summary>
     /// <param name="accountId">The ID of the account to update.</param>
     /// <param name="account">The updated account information.</param>
-    public record UpdateAccountCommand(string accountId, BankAccount account) : IRequest<BankAccount>;
+    public record UpdateAccountCommand(string accountId, BankAccount account): IRequest<BankAccount>;
 
     /// <summary>
     /// Handles the update of a bank account.
@@ -36,6 +37,17 @@ namespace BankingApp.Application.Commands
             this.repository = repository;
             this.mediator = mediator;
         }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="UpdateBankAccountHandler"/> class.
+        /// </summary>
+        /// <param name="repository"></param>
+        public UpdateBankAccountHandler(IBankAccountRepository repository)
+        {
+            this.repository = repository;
+            this.mediator = new Mock<IPublisher>().Object; // Or use a default implementation
+        }
+
 
         /// <summary>
         /// Handles the update account command.

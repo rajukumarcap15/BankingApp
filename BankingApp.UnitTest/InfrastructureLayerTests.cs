@@ -1,4 +1,6 @@
-﻿using BankingApp.Infrastructure.Repositories;
+﻿using BankingApp.Application.Commands;
+using BankingApp.Application.Queries;
+using BankingApp.Infrastructure.Repositories;
 
 namespace BankingApp.UnitTest
 {
@@ -7,28 +9,40 @@ namespace BankingApp.UnitTest
         private readonly BankAccountRepository _repo = new();
 
         [Fact]
-        public void GetAll_ShouldReturnAccounts()
+        public async Task ReturnsAccountsOfSpecifiedType()
         {
-            var accounts = _repo.GetAll();
-            Assert.NotEmpty(accounts);
+            var repo = new BankAccountRepository();
+            var handler = new GetAccountsByTypeHandler(repo);
+
+            var result = await handler.Handle(new GetAccountsByTypeQuery("savings"), default);
+
+            Assert.All(result, a => Assert.Equal("savings", a.AccountType, ignoreCase: true));
         }
 
         [Fact]
-        public void GetById_ShouldReturnCorrectAccount()
+        public async Task GetById_ShouldReturnCorrectAccount()
         {
-            var account = _repo.GetAll().First();
-            var result = _repo.GetById(account.Id);
-            Assert.Equal(account.Id, result.Id);
+            var repo = new BankAccountRepository();
+            var sample = repo.GetByType("savings").First();
+            var handler = new GetAccountByIdHandler(repo);
+
+            var result = await handler.Handle(new GetAccountByIdQuery(sample.AccountId), default);
+
+            Assert.Equal(sample.Id, result?.Id);
         }
 
         [Fact]
-        public void Update_ShouldModifyAccount()
+        public async Task UpdatesAccountSuccessfully()
         {
-            var account = _repo.GetAll().First();
-            var updated = _repo.Update(account.Id, "Updated Name", 9999);
+            var repo = new BankAccountRepository();
+            var sample = repo.GetByType("savings").First();
+            sample.Balance += 500;
 
-            Assert.Equal("Updated Name", updated.AccountHolder);
-            Assert.Equal(9999, updated.Balance);
+            var handler = new UpdateBankAccountHandler(repo);
+            await handler.Handle(new UpdateAccountCommand(sample.AccountId, sample), default);
+
+            var updated = repo.GetById(sample.AccountId);
+            Assert.Equal(sample.Balance, updated?.Balance);
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc.Testing;
+﻿using BankingApp.Infrastructure.Repositories;
+using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.VisualStudio.TestPlatform.TestHost;
 
 namespace BankingApp.UnitTest
@@ -22,8 +23,8 @@ namespace BankingApp.UnitTest
         [Fact]
         public async Task GetById_ShouldReturnOkOrNotFound()
         {
-            var repo = new BankingSystem.Infrastructure.MockBankRepository();
-            var account = repo.GetAll().First();
+            var repo = new BankAccountRepository();
+            var account = repo.GetByType("savings").First();
 
             var response = await _client.GetAsync($"/api/BankAccounts/{account.Id}");
             response.EnsureSuccessStatusCode();

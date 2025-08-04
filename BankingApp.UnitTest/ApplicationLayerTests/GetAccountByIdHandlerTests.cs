@@ -16,6 +16,15 @@ namespace BankingApp.UnitTest.ApplicationLayerTests
 
             Assert.Equal(sample.Id, result?.Id);
         }
-    }
 
+        [Fact]
+        public async Task ReturnsNullForNonExistentAccount()
+        {
+            var repo = new BankAccountRepository();
+            var handler = new GetAccountByIdHandler(repo);
+            var result = await handler.Handle(new GetAccountByIdQuery("non-existent-id"), default);
+            Assert.Null(result);
+        }
+
+    }
 }
