@@ -59,6 +59,7 @@ namespace BankingApp.Api.Middleware
             context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
 
             var json = JsonSerializer.Serialize(response);
+            Console.WriteLine(json);
             return context.Response.WriteAsync(json);
         }
     }

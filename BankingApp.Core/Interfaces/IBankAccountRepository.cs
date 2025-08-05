@@ -4,6 +4,7 @@
 
 namespace BankingApp.Core.Interfaces
 {
+    using BankingApp.Core.Dtos;
     using BankingApp.Core.Entities;
 
     /// <summary>
@@ -31,7 +32,7 @@ namespace BankingApp.Core.Interfaces
         /// <param name="accountId">The unique identifier of the bank account to update.</param>
         /// <param name="entity">The updated <see cref="BankAccount"/> entity.</param>
         /// <returns>A task that represents the asynchronous operation. The task result contains the updated <see cref="BankAccount"/>.</returns>
-        Task<BankAccount> UpdateAccount(string accountId, BankAccount entity);
+        Task<UpdateBankAccountDto> UpdateAccount(string accountId, UpdateBankAccountDto entity);
     }
 }
 

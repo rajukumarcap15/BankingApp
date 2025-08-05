@@ -1,4 +1,8 @@
-﻿namespace BankingApp.Api
+﻿// <copyright file="DependencyInjection.cs" company="PlaceholderCompany">
+// Copyright (c) PlaceholderCompany. All rights reserved.
+// </copyright>
+
+namespace BankingApp.Api
 {
     using BankingApp.Application;
     using BankingApp.Core;
@@ -20,7 +24,7 @@
         {
             // Register your API services here
             // Example: services.AddControllers();
-            services.AddApplicationDI().AddInfrastructureDI().AddCoreDI(configuration); ;
+            services.AddApplicationDI().AddInfrastructureDI().AddCoreDI(configuration);
             return services;
         }
     }

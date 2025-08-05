@@ -4,10 +4,9 @@
 
 namespace BankingApp.Infrastructure.Repositories
 {
-    using Azure.Core;
+    using BankingApp.Core.Dtos;
     using BankingApp.Core.Entities;
     using BankingApp.Core.Interfaces;
-    using Microsoft.EntityFrameworkCore;
 
     /// <summary>
     /// Repository for managing bank account data.
@@ -42,7 +41,6 @@ namespace BankingApp.Infrastructure.Repositories
             return await Task.FromResult(this.accounts.ToList());
         }
 
-
         /// <summary>
         /// Gets all bank accounts of the specified type.
         /// </summary>
@@ -62,12 +60,15 @@ namespace BankingApp.Infrastructure.Repositories
         }
 
         /// <summary>
-        /// Updates an existing bank account with new data.
+        /// Updates an existing bank account with new details.
         /// </summary>
-        /// <param name="accountId">The account ID of the account to update.</param>
-        /// <param name="account">The new account data.</param>
-        /// <returns>The updated bank account, or null if not found.</returns>
-        public async Task<BankAccount> UpdateAccount(string accountId, BankAccount account)
+        /// <param name="accountId">The account ID of the bank account to update.</param>
+        /// <param name="account">The updated bank account details.</param>
+        /// <returns>
+        /// A <see cref="Task{TResult}"/> representing the asynchronous operation.
+        /// The updated <see cref="UpdateBankAccountDto"/> if the account exists; otherwise, <c>null</c>.
+        /// </returns>
+        public async Task<UpdateBankAccountDto> UpdateAccount(string accountId, UpdateBankAccountDto account)
         {
             var existing = this.accounts.FirstOrDefault(a => a.AccountId == accountId);
             if (existing != null)
@@ -79,7 +80,7 @@ namespace BankingApp.Infrastructure.Repositories
 
                 // Simulate async operation
                 await Task.CompletedTask;
-                return existing;
+                return account;
             }
             else
             {

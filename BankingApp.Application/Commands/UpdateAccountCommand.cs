@@ -5,7 +5,7 @@
 namespace BankingApp.Application.Commands
 {
     using BankingApp.Application.Events;
-    using BankingApp.Core.Entities;
+    using BankingApp.Core.Dtos;
     using BankingApp.Core.Interfaces;
     using MediatR;
     using Moq;
@@ -15,14 +15,14 @@ namespace BankingApp.Application.Commands
     /// </summary>
     /// <param name="accountId">The ID of the account to update.</param>
     /// <param name="account">The updated account information.</param>
-    public record UpdateAccountCommand(string accountId, BankAccount account): IRequest<BankAccount>;
+    public record UpdateAccountCommand(string accountId, UpdateBankAccountDto account) : IRequest<UpdateBankAccountDto>;
 
     /// <summary>
     /// Handles the update of a bank account.
     /// </summary>
     /// <param name="repository">The bank account repository.</param>
     /// <param name="mediator">The event publisher.</param>
-    public class UpdateBankAccountHandler : IRequestHandler<UpdateAccountCommand, BankAccount>
+    public class UpdateBankAccountHandler : IRequestHandler<UpdateAccountCommand, UpdateBankAccountDto>
     {
         private readonly IBankAccountRepository repository;
         private readonly IPublisher mediator;
@@ -41,13 +41,12 @@ namespace BankingApp.Application.Commands
         /// <summary>
         /// Initializes a new instance of the <see cref="UpdateBankAccountHandler"/> class.
         /// </summary>
-        /// <param name="repository"></param>
+        /// <param name="repository">The bank account repository.</param>
         public UpdateBankAccountHandler(IBankAccountRepository repository)
         {
             this.repository = repository;
             this.mediator = new Mock<IPublisher>().Object; // Or use a default implementation
         }
-
 
         /// <summary>
         /// Handles the update account command.
@@ -55,7 +54,7 @@ namespace BankingApp.Application.Commands
         /// <param name="request">The update account command.</param>
         /// <param name="cancellationToken">A cancellation token.</param>
         /// <returns>The updated bank account.</returns>
-        public async Task<BankAccount> Handle(UpdateAccountCommand request, CancellationToken cancellationToken)
+        public async Task<UpdateBankAccountDto> Handle(UpdateAccountCommand request, CancellationToken cancellationToken)
         {
             var account = await this.repository.UpdateAccount(request.accountId, request.account);
             if (account == null)

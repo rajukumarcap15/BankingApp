@@ -6,17 +6,31 @@ namespace BankingApp.Api.Controllers
 {
     using BankingApp.Application.Commands;
     using BankingApp.Application.Queries;
-    using BankingApp.Core.Entities;
+    using BankingApp.Core.Dtos;
+    using FluentResults;
     using MediatR;
     using Microsoft.AspNetCore.Mvc;
+    using Microsoft.Identity.Client;
 
     /// <summary>
     /// Controller for managing bank accounts.
     /// </summary>
     [Route("api/[controller]")]
     [ApiController]
-    public class BankAccountsController(IMediator mediator) : ControllerBase
+    public class BankAccountsController : ControllerBase
     {
+        /// <summary>
+        /// Gets the mediator instance used for sending commands and queries.
+        /// </summary>
+        public IMediator Mediator { get; }
+        private readonly ILogger<BankAccountsController> _logger;
+
+        public BankAccountsController(IMediator mediator, ILogger<BankAccountsController> logger)
+        {
+            Mediator = mediator;
+            _logger = logger;
+        }
+
         /// <summary>
         /// Gets bank accounts by type.
         /// </summary>
@@ -25,8 +39,10 @@ namespace BankingApp.Api.Controllers
         [HttpGet("type/{type}")]
         public async Task<IActionResult> GetByType(string type)
         {
-            var accounts = await mediator.Send(new GetAccountsByTypeQuery(type));
-            return this.Ok(accounts);
+            _logger.LogInformation("Received request to get accounts of type: {Type}", type);
+            var result = await this.Mediator.Send(new GetAccountsByTypeQuery(type));
+            _logger.LogInformation("Returning {Count} accounts of type {Type}", result.Count(), type);
+            return this.Ok(result);
         }
 
         /// <summary>
@@ -37,12 +53,14 @@ namespace BankingApp.Api.Controllers
         [HttpGet("accountId/{accountId}")]
         public async Task<IActionResult> GetById(string accountId)
         {
-            var account = await mediator.Send(new GetAccountByIdQuery(accountId));
+            _logger.LogInformation("Received request to get account with AccountId: {AccountId}", accountId);
+            var account = await this.Mediator.Send(new GetAccountByIdQuery(accountId));
             if (account == null)
             {
+                _logger.LogWarning("Account with AccountId {AccountId} not found", accountId);
                 return this.NotFound();
             }
-
+            _logger.LogInformation("Returning account with AccountId {AccountId}", accountId);
             return this.Ok(account);
         }
 
@@ -53,10 +71,19 @@ namespace BankingApp.Api.Controllers
         /// <param name="updatedAccount">The updated bank account information.</param>
         /// <returns>The updated bank account.</returns>
         [HttpPut("{accountId}")]
-        public async Task<IActionResult> UpdateAccount(string accountId, [FromBody] BankAccount updatedAccount)
+        public async Task<IActionResult> UpdateAccount(string accountId, [FromBody] UpdateBankAccountDto updatedAccount)
         {
-            var result = await mediator.Send(new UpdateAccountCommand(accountId, updatedAccount));
-            return this.Ok(result);
+            _logger.LogInformation("Received request to update account with AccountId: {AccountId}", accountId);
+            var result = await this.Mediator.Send(new UpdateAccountCommand(accountId, updatedAccount));
+
+            if (result != null)
+            {
+                _logger.LogInformation("Successfully updated account with AccountId {AccountId}", accountId);
+                return this.Ok(result);
+            }
+
+            _logger.LogWarning("Update failed: Account with AccountId {AccountId} not found", accountId);
+            return NotFound();
         }
     }
 }

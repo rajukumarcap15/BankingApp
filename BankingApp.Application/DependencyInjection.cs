@@ -1,4 +1,8 @@
-﻿namespace BankingApp.Application
+﻿// <copyright file="DependencyInjection.cs" company="PlaceholderCompany">
+// Copyright (c) PlaceholderCompany. All rights reserved.
+// </copyright>
+
+namespace BankingApp.Application
 {
     using System.Reflection;
     using Microsoft.Extensions.DependencyInjection;
